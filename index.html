@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindArt Studio — Modern Interactive Portfolio</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================
+       1. CSS VARIABLES & SYSTEM DESIGN (BLUE-YELLOW)
+       ========================================== */
+    :root {
+      /* Brand Colors */
+      --primary-blue: #0f172a;
+      --accent-yellow: #facc15;
+      --accent-yellow-hover: #eab308;
+      --electric-blue: #2563eb;
+      
+      /* Light Theme Defaults */
+      --bg-main: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --bg-nav: rgba(255, 255, 255, 0.75);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: rgba(15, 23, 42, 0.1);
+      --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      --glow-shadow: 0 10px 25px -5px rgba(250, 204, 21, 0.4);
+    }
+
+    [data-theme="dark"] {
+      /* Dark Theme Overrides */
+      --bg-main: #0b132b;
+      --bg-card: rgba(28, 37, 65, 0.75);
+      --bg-nav: rgba(11, 19, 43, 0.8);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Base Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ==========================================
+       2. HEADER & FLOATING NAVIGATION
+       ========================================== */
+    .header {
+      position: fixed;
+      top: 1rem;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+    }
+
+    .nav-container {
+      width: 90%;
+      max-width: 1100px;
+      background: var(--bg-nav);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 99px;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--card-shadow);
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .logo span {
+      color: var(--accent-yellow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-yellow);
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.4rem 0.8rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* ==========================================
+       3. HERO SECTION
+       ========================================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 5rem;
+      position: relative;
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hero-text h1 {
+      font-size: 3.5rem;
+      line-height: 1.1;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+    }
+
+    .highlight-yellow {
+      color: var(--accent-yellow);
+      background: linear-gradient(120deg, rgba(250, 204, 21, 0.2) 0%, rgba(250, 204, 21, 0) 100%);
+      padding: 0 0.2rem;
+    }
+
+    .hero-text p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.8rem 1.8rem;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-yellow-hover);
+      transform: translateY(-3px);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-yellow);
+    }
+
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .visual-card {
+      width: 100%;
+      height: 380px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visual-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(250, 204, 21, 0.15) 0%, rgba(0,0,0,0) 70%);
+      animation: rotate 15s linear infinite;
+    }
+
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ==========================================
+       4. PORTFOLIO SHOWCASE SECTION
+       ========================================== */
+    .portfolio {
+      padding: 6rem 0;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+    }
+
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 50px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent-yellow);
+      color: #0f172a;
+      border-color: var(--accent-yellow);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 200px;
+      background-color: var(--electric-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.2rem;
+      position: relative;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent-yellow-hover);
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================
+       5. SKILLS MATRIX SECTION
+       ========================================== */
+    .skills {
+      padding: 4rem 0 6rem;
+    }
+
+    .skills-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .skill-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .skill-badge:hover {
+      transform: scale(1.05);
+      border-color: var(--accent-yellow);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-yellow);
+      border-radius: 50%;
+    }
+
+    /* ==========================================
+       6. CONTACT SECTION
+       ========================================== */
+    .contact {
+      padding: 6rem 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .form-input {
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-yellow);
+      box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.3);
+    }
+
+    /* ==========================================
+       7. MODAL POPUP
+       ========================================== */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 2000;
+      padding: 1.5rem;
+    }
+
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      max-width: 600px;
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.active .modal-content {
+      transform: scale(1);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Scroll Animations Target */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .btn-group {
+        justify-content: center;
+      }
+
+      .hero-text h1 {
+        font-size: 2.5rem;
+      }
+
+      .nav-links {
+        display: none; /* Can be expanded to mobile menu */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <nav class="nav-container">
+      <a href="#" class="logo">MindArt<span>Studio</span></a>
+      <ul class="nav-links">
+        <li><a href="#hero">Beranda</a></li>
+        <li><a href="#portfolio">Portofolio</a></li>
+        <li><a href="#skills">Keahlian</a></li>
+        <li><a href="#contact">Kontak</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+        🌙 <span id="themeLabel">Dark</span>
+      </button>
+    </nav>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="container hero-content">
+      <div class="hero-text reveal">
+        <h1>Inovasi Visual & <span class="highlight-yellow">Pengalaman Digital</span></h1>
+        <p>MindArt Studio mengintegrasikan estetika seni kreatif dengan ketajaman arsitektur web modern. Menyajikan karya interaktif yang responsif dan berdampak.</p>
+        <div class="btn-group">
+          <a href="#portfolio" class="btn btn-primary">Lihat Karya</a>
+          <a href="#contact" class="btn btn-secondary">Hubungi Kami</a>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="visual-card">
+          <h3 style="z-index: 2;">MindArt Canvas</h3>
+          <p style="z-index: 2; color: var(--text-muted); font-size: 0.9rem;">Interactive Showcase</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="portfolio" id="portfolio">
+    <div class="container">
+      <div class="section-title reveal">
+        <h2>Showcase Karya</h2>
+        <p>Eksplorasi proyek digital interaktif dan desain pilihan kami.</p>
+      </div>
+
+      <div class="filter-bar reveal">
+        <button class="filter-btn active" data-filter="all">Semua</button>
+        <button class="filter-btn" data-filter="web">Web App</button>
+        <button class="filter-btn" data-filter="design">Design & Art</button>
+        <button class="filter-btn" data-filter="game">Gamifikasi</button>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="card reveal" data-category="web" onclick="openModal('KelasKreatif Super App', 'Aplikasi edukasi interaktif untuk pengelolaan kelas modern berbasis gamifikasi.', 'Web App')">
+          <div class="card-img">KelasKreatif</div>
+          <div class="card-body">
+            <span class="card-tag">Web App</span>
+            <h3 class="card-title">KelasKreatif Platform</h3>
+            <p class="card-desc">Sistem gamifikasi pengelolaan kelas dan generator kelompok interaktif.</p>
+          </div>
+        </div>
+
+        <div class="card reveal" data-category="game" onclick="openModal('Detektif Karya', 'Platform analisis estetika dan kritik seni interaktif ala investigasi forensik.', 'Gamifikasi')">
+          <div class="card-img" style="background-color: #4f46e5;">Detektif Karya</div>
+          <div class="card-body">
+            <span class="card-tag">Gamifikasi</span>
+            <h3 class="card-title">Detektif Karya</h3>
+            <p class="card-desc">Aplikasi gamifikasi analisis & apresiasi karya seni rupa.</p>
+          </div>
+        </div>
+
+        <div class="card reveal" data-category="design" onclick="openModal('Visual Identity Package', 'Perancangan aset visual modern beresolusi tinggi dengan skema warna futuristik.', 'Design & Art')">
+          <div class="card-img" style="background-color: #0284c7;">Modern UI/UX</div>
+          <div class="card-body">
+            <span class="card-tag">Design & Art</span>
+            <h3 class="card-title">2D Character & Asset</h3>
+            <p class="card-desc">Koleksi desain karakter digital dan UI kit dengan estetika bersih.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="skills" id="skills">
+    <div class="container">
+      <div class="section-title reveal">
+        <h2>Keahlian & Core Tech</h2>
+      </div>
+      <div class="skills-wrapper reveal">
+        <div class="skill-badge"><span class="dot"></span> HTML5 / Semantic UI</div>
+        <div class="skill-badge"><span class="dot"></span> CSS3 / Flexbox & Grid</div>
+        <div class="skill-badge"><span class="dot"></span> Modern JavaScript (ES6+)</div>
+        <div class="skill-badge"><span class="dot"></span> Responsive Web Design</div>
+        <div class="skill-badge"><span class="dot"></span> UI/UX & Gamification</div>
+        <div class="skill-badge"><span class="dot"></span> 2D Digital Art</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="container">
+      <div class="section-title reveal">
+        <h2>Mulai Berkolaborasi</h2>
+        <p>Punya ide menarik? Mari wujudkan bersama MindArt Studio.</p>
+      </div>
+      <form class="contact-form reveal" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label for="name">Nama</label>
+          <input type="text" id="name" class="form-input" placeholder="Nama Anda" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" class="form-input" placeholder="email@domain.com" required />
+        </div>
+        <div class="form-group">
+          <label for="message">Pesan</label>
+          <textarea id="message" class="form-input" rows="4" placeholder="Tuliskan pesan atau ide proyek Anda..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-content: center;">Kirim Pesan</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="modal" id="projectModal" onclick="closeModalOnBg(event)">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <span class="card-tag" id="modalCategory">Category</span>
+      <h2 id="modalTitle" style="margin-bottom: 1rem;">Project Title</h2>
+      <p id="modalDesc" style="color: var(--text-muted); margin-bottom: 1.5rem;">Project detail explanation goes here.</p>
+      <button class="btn btn-primary" onclick="closeModal()">Tutup Preview</button>
+    </div>
+  </div>
+
+  <script>
+    /* --------------------------------------------------
+       1. Theme Toggle (Dark / Light Mode)
+       -------------------------------------------------- */
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeLabel = document.getElementById('themeLabel');
+    
+    // Check local storage or system preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeUI(newTheme);
+    });
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeToggleBtn.innerHTML = '☀️ <span>Light</span>';
+      } else {
+        themeToggleBtn.innerHTML = '🌙 <span>Dark</span>';
+      }
+    }
+
+    /* --------------------------------------------------
+       2. Portfolio Interactive Filtering
+       -------------------------------------------------- */
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.gallery-grid .card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all buttons
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filterValue = btn.getAttribute('data-filter');
+
+        cards.forEach(card => {
+          if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    /* --------------------------------------------------
+       3. Scroll Reveal Animation
+       -------------------------------------------------- */
+    const revealElements = document.querySelectorAll('.reveal');
+
+    function revealOnScroll() {
+      const windowHeight = window.innerHeight;
+      revealElements.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        const revealPoint = 100;
+
+        if (elementTop < windowHeight - revealPoint) {
+          el.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('load', revealOnScroll);
+
+    /* --------------------------------------------------
+       4. Modal Logic
+       -------------------------------------------------- */
+    const modal = document.getElementById('projectModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalCategory = document.getElementById('modalCategory');
+
+    function openModal(title, desc, category) {
+      modalTitle.textContent = title;
+      modalDesc.textContent = desc;
+      modalCategory.textContent = category;
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+    }
+
+    function closeModalOnBg(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    }
+
+    /* --------------------------------------------------
+       5. Form Submit Handling (Simulation)
+       -------------------------------------------------- */
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      alert('Terima kasih! Pesan Anda telah terkirim ke MindArt Studio.');
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>
